@@ -31,9 +31,9 @@ const Bitacora = () => {
         .from('usuario')
         .select('id, nombre');
       if (error) throw error;
-      const usuariosMap = {};
-      data.forEach(u => { usuariosMap[u.id] = u.nombre; });
-      setUsuarios(usuariosMap);
+      const map = {};
+      data.forEach(u => { map[u.id] = u.nombre; });
+      setUsuarios(map);
     } catch (err) {
       toast.error('Error al cargar usuarios: ' + err.message);
     }
@@ -89,7 +89,8 @@ const Bitacora = () => {
                 {bitacora.map(registro => {
                   const dt = new Date(registro.fecha_hora);
                   const fechaHora = dt.toLocaleString();
-                  const ipLimpia = registro.ip_origen.split('/')[0];
+                  let ipRaw = registro.ip_origen.split('/')[0];
+                  const ipLimpia = ipRaw === '::1' ? '127.0.0.1' : ipRaw;
 
                   return (
                     <tr key={registro.id}>
