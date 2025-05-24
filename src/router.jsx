@@ -21,6 +21,7 @@ import EventosPorTipo from './pages/EventosPorTipo';
 import InscribirEquipo from "./pages/InscribirEquipo.jsx";
 import EventosInscritos from './pages/EventosInscritos';
 import PublicRoute from "./components/PublicRoute.jsx";
+import Bitacora from "./pages/Bitacora.jsx";
 
 
 export const router = createBrowserRouter([
@@ -156,9 +157,19 @@ export const router = createBrowserRouter([
                 <DarRol />
               </PrivateRoute>
             )
-          }
+          },
+          {
+            path: "bitacora",
+            element: (
+                <PrivateRoute>
+                    <Bitacora />
+                </PrivateRoute>
+            )
+        }
+
         ]
       },
+
       // fallback 404
       {
         path: "*",
