@@ -5,6 +5,9 @@ import {router} from './router.jsx'
 import {AuthContextProvider} from './context/AuthContext.jsx'
 import {ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { initLogUpdater } from './utils/logUpdater.js'
+
+initLogUpdater()
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

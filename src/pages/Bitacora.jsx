@@ -89,7 +89,8 @@ const Bitacora = () => {
                 {bitacora.map(registro => {
                   const dt = new Date(registro.fecha_hora);
                   const fechaHora = dt.toLocaleString();
-                  let ipRaw = registro.ip_origen.split('/')[0];
+                  const raw = registro.ip_origen ?? '';
+                  const ipRaw = raw.split('/')[0] || 'desconocido';
                   const ipLimpia = ipRaw === '::1' ? '127.0.0.1' : ipRaw;
 
                   return (
