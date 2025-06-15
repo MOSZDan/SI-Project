@@ -23,7 +23,6 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Validaciones
     if (!registro || !password) {
       toast.error('Por favor, rellena todos los campos.');
       setLoading(false);
@@ -36,7 +35,6 @@ const Login = () => {
       return;
     }
 
-    // Obtener email desde caché o DB
     let email = getCorreoCache(registroInt);
     if (!email) {
       const { data, error } = await supabase
@@ -53,60 +51,69 @@ const Login = () => {
       setCorreoCache(registroInt, email);
     }
 
-    // Intento de login
     const result = await signInUser(email, password);
     setLoading(false);
 
     if (result.success) {
-      // Redirige al home ("/") en vez de dashboard
       navigate('/');
-    } else {
-      // signInUser ya muestra toast de error
     }
   };
 
+  /**
+   * Esta es la nueva función de reseteo de contraseña.
+   * Utiliza el método nativo de Supabase 'resetPasswordForEmail',
+   * que es más simple y directo que usar Edge Functions para este caso.
+   */
   const handleResetPassword = async () => {
-  if (!registro) {
-    toast.error("Primero escribe tu número de registro");
-    return;
-  }
-
-  const registerToInteger = Number(registro);
-
-  if (isNaN(registerToInteger) || !Number.isInteger(registerToInteger) || registerToInteger < 0) {
-    toast.error("Registro inválido.");
-    return;
-  }
-
-  let email = getCorreoCache(registerToInteger);
-
-  if (!email) {
-    const { data, error } = await supabase
-      .from("usuario")
-      .select("correo")
-      .eq("id", registerToInteger)
-      .maybeSingle();
-
-    if (error || !data) {
-      toast.error("Registro no encontrado.");
+    if (!registro) {
+      toast.error('Para restablecer la contraseña, primero escribe tu número de registro.');
       return;
     }
 
-    email = data.correo;
-    setCorreoCache(registerToInteger, email);
-  }
+    const registroInt = Number(registro);
+    if (isNaN(registroInt) || !Number.isInteger(registroInt) || registroInt < 0) {
+      toast.error('Por favor, ingresa un número de registro válido.');
+      return;
+    }
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://notificct.vercel.app/update-password", // o tu dominio en producción
-  });
+    setLoading(true);
+    try {
+      // Busca el correo asociado al registro (usando caché primero)
+      let email = getCorreoCache(registroInt);
+      if (!email) {
+        const { data, error: userError } = await supabase
+          .from("usuario")
+          .select("correo")
+          .eq("id", registroInt)
+          .maybeSingle();
 
-  if (error) {
-    toast.error("No se pudo enviar el correo: " + error.message);
-  } else {
-    toast.success("Te enviamos un correo para restablecer tu contraseña.");
-  }
-};
+        if (userError || !data) {
+          toast.error("El registro ingresado no fue encontrado.");
+          return;
+        }
 
+        email = data.correo;
+        setCorreoCache(registroInt, email);
+      }
+
+      // Llama a la función de Supabase para enviar el correo de reseteo
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: "https://notificct.vercel.app/update-password",
+      });
+
+      if (resetError) {
+        throw resetError; // Lanza el error para que sea capturado por el catch
+      }
+
+      toast.success("Revisa tu correo para restablecer la contraseña.");
+
+    } catch (error) {
+      console.error("Error en restablecimiento:", error);
+      toast.error(`No se pudo enviar el correo: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -137,14 +144,14 @@ const Login = () => {
 
             <div className="mb-3 text-end">
               <button
-                  type="button"
-                    onClick={handleResetPassword}
-                  className="btn btn-link text-decoration-none text-primary fs-6"
-                    >
-                   ¿Olvidaste tu contraseña?
-                </button>
-                </div>
-
+                type="button"
+                onClick={handleResetPassword}
+                className="btn btn-link text-decoration-none text-primary fs-6"
+                disabled={loading}
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
 
             <div className="d-grid mb-3">
               <button
