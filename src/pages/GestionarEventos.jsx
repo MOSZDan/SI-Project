@@ -77,6 +77,28 @@ const GestionarEventos = () => {
         }
     };
 
+    const aprobarEvento = async (eventoId) => {
+        const { error } = await supabase
+            .from('evento')
+            .update({ id_estado: 1 }) // Cambia a "Inscripción Abierta"
+            .eq('id', eventoId);
+
+        if (error) {
+            toast.error('Error al aprobar el evento.');
+        } else {
+            toast.success('Evento aprobado y publicado.');
+            cargarEventos(); // Recarga la lista de eventos
+        }
+    };
+
+    const rechazarEvento = async (eventoId) => {
+        // Opcional: puedes cambiar el estado a "Cancelado" (6) o eliminarlo
+        const confirmado = window.confirm("¿Estás seguro de que deseas rechazar y eliminar este evento?");
+        if (!confirmado) return;
+
+        // Llama a la función que ya tienes para eliminar
+        await eliminarEvento(eventoId);
+    };
 
     const eliminarEvento = async (id) => {
         const confirmado = window.confirm("¿Estás seguro de que deseas eliminar este evento?");
@@ -235,6 +257,11 @@ const GestionarEventos = () => {
                                 </>
                             ) : (
                                 <>
+                                     {evento.id_estado === 8 && (
+                                        <div className="alert alert-warning" role="alert">
+                                            <strong>Pendiente de Aprobación</strong>
+                                        </div>
+                                    )}
                                     <h5 className="card-title">{evento.nombre}</h5>
                                     <p className="card-text">{evento.descripcion}</p>
                                     <p className="card-text">
@@ -245,6 +272,16 @@ const GestionarEventos = () => {
                                     </p>
 
                                     <div className="d-flex flex-wrap gap-2 mt-3">
+                                        {evento.id_estado === 8 && (
+                                            <>
+                                                <button className="btn btn-success" onClick={() => aprobarEvento(evento.id)}>
+                                                    ✅ Aprobar
+                                                </button>
+                                                <button className="btn btn-danger" onClick={() => rechazarEvento(evento.id)}>
+                                                    ❌ Rechazar
+                                                </button>
+                                            </>
+                                        )}
                                         <button className="btn btn-primary" onClick={() => iniciarEdicion(evento)}>
                                             ✏️ Editar
                                         </button>

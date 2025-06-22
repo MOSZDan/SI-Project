@@ -24,13 +24,14 @@ const EventCard = ({evento}) => {
         return texto.length > limite ? texto.slice(0, limite) + '...' : texto;
     };
 
-    const estadoColor = {
+   const estadoColor = {
         1: 'success',
         2: 'secondary',
         3: 'info',
         4: 'primary',
         5: 'dark',
-        6: 'danger'
+        6: 'danger',
+        8: 'warning', // Añadido
     };
 
     const estadoNombre = {
@@ -39,7 +40,8 @@ const EventCard = ({evento}) => {
         3: 'Próximamente',
         4: 'En Curso',
         5: 'Finalizado',
-        6: 'Cancelado'
+        6: 'Cancelado',
+        8: 'Pendiente', // Añadido
     };
 
     return (

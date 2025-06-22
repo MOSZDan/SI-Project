@@ -39,7 +39,7 @@ function convertToSquareWithBlackBackground(base64Image) {
 
 const CrearEvento = () => {
     const {user, tipoUsuario} = UserAuth();
-    const esAdmin = tipoUsuario === 6 || tipoUsuario === 7;
+    const esAdmin = tipoUsuario === 7;
     const navigate = useNavigate();
 
     const [nombre, setNombre] = useState('');
@@ -126,8 +126,7 @@ const CrearEvento = () => {
             return;
         }
 
-
-        setLoading(true); // ✅ SOLO después de pasar todas las validaciones
+        setLoading(true);
 
         try {
             const {data: usuarioData} = await supabase
@@ -136,16 +135,24 @@ const CrearEvento = () => {
                 .eq('correo', user.email)
                 .maybeSingle();
 
-            const id_usuario = usuarioData?.id;
-            if (!id_usuario) {
+            if (!usuarioData?.id) {
                 toast.error('No se pudo obtener el ID del usuario.');
+                setLoading(false);
                 return;
             }
+
+            const id_usuario = usuarioData.id;
+
+            // Determina el estado inicial del evento
+            // Si no es admin y el tipo de evento es "Evento Informal" (ID 6),
+            // se establece como "Pendiente de Aprobación" (ID 8).
+            // De lo contrario, se establece como "Inscripción Abierta" (ID 1).
+            const estadoInicial = !esAdmin && tipoEvento === '6' ? 8 : 1;
 
             let imagenUrl = null;
 
             if (imagen) {
-                const fileExt = 'jpg'; // asumimos que el cropper devuelve JPEG
+                const fileExt = 'jpg'; // asumo que el cropper devuelve JPEG
                 const fileName = `${Date.now()}.${fileExt}`;
                 const filePath = fileName;
 
@@ -155,6 +162,7 @@ const CrearEvento = () => {
 
                 if (uploadError) {
                     toast.error('Error subiendo la imagen.');
+                    setLoading(false);
                     return;
                 }
 
@@ -175,7 +183,7 @@ const CrearEvento = () => {
                     fechafin: fechaFin,
                     id_ubicacion: parseInt(ubicacion),
                     id_tevento: parseInt(tipoEvento),
-                    id_estado: 1,
+                    id_estado: estadoInicial, // Usamos el estado determinado
                     id_usuario_creador: id_usuario,
                     imagen_url: imagenUrl,
                     clave_asistencia: tipoEvento === '4' ? claveAsistencia.trim() : null
@@ -196,14 +204,25 @@ const CrearEvento = () => {
                 await supabase.from('horarioevento').insert(inserts);
             }
 
-            toast.dismiss(); // por si había uno pendiente
-            navigate(`/detalle-evento-creador/${insertedEvento.id}`);
+            toast.dismiss();
+
+            // Mensaje personalizado al finalizar
+            if (estadoInicial === 8) {
+                toast.success('Tu evento ha sido enviado y está pendiente de aprobación.');
+            } else {
+                toast.success('Evento creado y publicado correctamente.');
+            }
+
+            setTimeout(() => {
+                navigate(`/detalle-evento-creador/${insertedEvento.id}`);
+            }, 2000);
+
 
         } catch (err) {
             toast.error('Error creando evento');
             console.error(err);
         } finally {
-            setLoading(false); // ✅ SIEMPRE se ejecuta
+            setLoading(false);
         }
     };
 
