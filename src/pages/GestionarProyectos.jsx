@@ -13,6 +13,7 @@ const MisProyectos = () => {
     const [pendientes, setPendientes] = useState([]);
     const [fechaLimite, setFechaLimite] = useState({});
     const [rechazoMotivo, setRechazoMotivo] = useState({});
+    const [evaluaciones, setEvaluaciones] = useState({});
 
     useEffect(() => {
         const cargarProyectos = async () => {
@@ -42,10 +43,12 @@ const MisProyectos = () => {
 
             const equiposIds = miembros.map(m => m.id_equipo);
 
+            // ==================== INICIO DE LA CORRECCIÓN ====================
             const {data: proyectosData, error} = await supabase
                 .from('proyecto')
-                .select('id, nombre, descripcion, url_informe, id_estado_proyecto, equipo(nombre)')
+                .select('id, nombre, descripcion, url_informe, id_estado_proyecto, id_equipo, equipo(nombre)') // Se añade id_equipo
                 .in('id_equipo', equiposIds);
+            // ===================== FIN DE LA CORRECCIÓN ======================
 
             if (error) {
                 console.error('Error al obtener proyectos:', error);
@@ -54,11 +57,27 @@ const MisProyectos = () => {
             }
 
             setProyectos(proyectosData || []);
+             if (proyectosData && proyectosData.length > 0) {
+                const {data: evalsData} = await supabase
+                    .from('evaluacion')
+                    .select('*, usuario:id_usuario (nombre)')
+                    .in('id_equipo', equiposIds);
+
+                const evalsPorEquipo = {};
+                (evalsData || []).forEach(ev => {
+                    if (!evalsPorEquipo[ev.id_equipo]) {
+                        evalsPorEquipo[ev.id_equipo] = [];
+                    }
+                    evalsPorEquipo[ev.id_equipo].push(ev);
+                });
+                setEvaluaciones(evalsPorEquipo);
+            }
         };
 
         cargarProyectos();
     }, [session]);
 
+    // ... (El resto del archivo no necesita cambios)
     useEffect(() => {
         if (tipoUsuario === 6 || tipoUsuario === 7) {
             cargarPendientes();
@@ -197,6 +216,20 @@ const MisProyectos = () => {
                                 </button>
                             </div>
                         )}
+                         <div className="mt-4">
+                            <h5>Retroalimentación de Tribunales</h5>
+                            {(evaluaciones[proyecto.id_equipo] || []).length > 0 ? (
+                                (evaluaciones[proyecto.id_equipo] || []).map(ev => (
+                                    <div key={ev.id} className="border rounded p-3 mt-2 bg-light">
+                                        <p><strong>Tribunal:</strong> {ev.usuario?.nombre || 'No identificado'}</p>
+                                        <p><strong>Puntaje:</strong> <span className="badge bg-primary">{ev.puntaje}</span></p>
+                                        <p className="mb-0"><strong>Comentarios:</strong> {ev.comentario || 'Sin comentarios.'}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-muted">Aún no has recibido evaluaciones.</p>
+                            )}
+                        </div>
                     </div>
                 ))}
 

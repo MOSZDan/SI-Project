@@ -13,7 +13,9 @@ export default function Navbar() {
     const [tiposEvento, setTiposEvento] = useState([]);
     const [submenuCategoriaAbierto, setSubmenuCategoriaAbierto] = useState(false);
     const [submenuMisEventosAbierto, setSubmenuMisEventosAbierto] = useState(false);
-    const [submenuGestionAbierto, setSubmenuGestionAbierto] = useState(false);
+    const [submenuGestionEventosAbierto, setSubmenuGestionEventosAbierto] = useState(false); // Renombrado para claridad
+    const [submenuGestionEquiposAbierto, setSubmenuGestionEquiposAbierto] = useState(false); // NUEVO
+    const [submenuGestionProyectosAbierto, setSubmenuGestionProyectosAbierto] = useState(false); // NUEVO
 
     useEffect(() => {
         const fetchTipos = async () => {
@@ -59,10 +61,7 @@ export default function Navbar() {
         } catch (error) {
             console.error("❌ Error inesperado al cerrar sesión:", error.message);
         } finally {
-            // 🧹 Limpiar cache de correo
             clearCorreoCache();
-
-            // Cerrar modal y redirigir
             setShowModal(false);
             navigate('/iniciar-sesion');
         }
@@ -71,7 +70,8 @@ export default function Navbar() {
     return (
         <>
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-3">
-                <NavLink className="navbar-brand d-flex align-items-center" to="/">
+                {/* ... (Tu código de NavLink y Toggler no cambia) ... */}
+                 <NavLink className="navbar-brand d-flex align-items-center" to="/">
                     <img src="/logo.png" alt="Logo" width="32" height="32" className="me-2"/>
                     <span className="fw-bold fs-4">NotiFicct</span>
                 </NavLink>
@@ -90,6 +90,7 @@ export default function Navbar() {
 
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav mb-2 mb-lg-0 w-100">
+                        {/* ... (Tu código de "Inicio" y "Eventos" no cambia) ... */}
                         <li className="nav-item">
                             <NavLink
                                 to="/"
@@ -130,7 +131,7 @@ export default function Navbar() {
                                             e.stopPropagation();
                                             setSubmenuCategoriaAbierto(!submenuCategoriaAbierto);
                                             setSubmenuMisEventosAbierto(false);
-                                            setSubmenuGestionAbierto(false);
+                                            setSubmenuGestionEventosAbierto(false);
                                         }}
                                         style={{width: '100%', textAlign: 'left', background: 'none', border: 'none'}}
                                     >
@@ -168,7 +169,7 @@ export default function Navbar() {
                                             e.stopPropagation();
                                             setSubmenuMisEventosAbierto(!submenuMisEventosAbierto);
                                             setSubmenuCategoriaAbierto(false);
-                                            setSubmenuGestionAbierto(false);
+                                            setSubmenuGestionEventosAbierto(false);
                                         }}
                                         style={{width: '100%', textAlign: 'left', background: 'none', border: 'none'}}
                                     >
@@ -229,7 +230,7 @@ export default function Navbar() {
                                                 className="dropdown-item text-white"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    setSubmenuGestionAbierto(!submenuGestionAbierto);
+                                                    setSubmenuGestionEventosAbierto(!submenuGestionEventosAbierto);
                                                     setSubmenuCategoriaAbierto(false);
                                                     setSubmenuMisEventosAbierto(false);
                                                 }}
@@ -242,7 +243,7 @@ export default function Navbar() {
                                             >
                                                 Gestión de Eventos ▼
                                             </button>
-                                            {submenuGestionAbierto && (
+                                            {submenuGestionEventosAbierto && (
                                                 <ul className="dropdown-menu show" style={{
                                                     position: 'relative',
                                                     background: 'transparent',
@@ -304,76 +305,47 @@ export default function Navbar() {
                                     </>
                                 )}
                             </ul>
-
                         </li>
+
+                        {/* ======================= INICIO DEL CÓDIGO CORREGIDO ======================= */}
                         {session && (
                             <li className="nav-item dropdown">
-                                <a
-                                    className="nav-link dropdown-toggle fs-5 text-white"
-                                    href="#"
-                                    role="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
+                                <a className="nav-link dropdown-toggle fs-5 text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Equipos y Proyectos
                                 </a>
                                 <ul className="dropdown-menu bg-primary border-0 shadow-none">
 
-                                    {/* Submenú de Gestión de Equipos */}
+                                    {/* Submenú Gestionar Equipos */}
                                     <li className="dropdown-submenu">
                                         <button
                                             type="button"
                                             className="dropdown-item text-white"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setSubmenuGestionAbierto(!submenuGestionAbierto);
+                                                setSubmenuGestionEquiposAbierto(!submenuGestionEquiposAbierto);
+                                                setSubmenuGestionProyectosAbierto(false); // Cierra el otro
                                             }}
-                                            style={{
-                                                width: '100%',
-                                                textAlign: 'left',
-                                                background: 'none',
-                                                border: 'none'
-                                            }}
+                                            style={{width: '100%', textAlign: 'left', background: 'none', border: 'none'}}
                                         >
                                             Gestionar Equipos ▼
                                         </button>
-                                        {submenuGestionAbierto && (
-                                            <ul className="dropdown-menu show" style={{
-                                                position: 'relative',
-                                                background: 'transparent',
-                                                border: 'none',
-                                                boxShadow: 'none'
-                                            }}>
+                                        {submenuGestionEquiposAbierto && (
+                                            <ul className="dropdown-menu show" style={{position: 'relative', background: 'transparent', border: 'none', boxShadow: 'none'}}>
                                                 <li>
-                                                    <NavLink
-                                                        to="/gestionar-equipos"
-                                                        className={({isActive}) =>
-                                                            `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`
-                                                        }
-                                                    >
+                                                    <NavLink to="/gestionar-equipos" className={({isActive}) => `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`}>
                                                         Gestionar Equipos
                                                     </NavLink>
                                                 </li>
                                                 {[6, 7].includes(tipoUsuario) && (
                                                     <li>
-                                                        <NavLink
-                                                            to="/asignar-tribunal"
-                                                            className={({isActive}) =>
-                                                                `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`
-                                                            }
-                                                        >
+                                                        <NavLink to="/asignar-tribunal" className={({isActive}) => `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`}>
                                                             Asignar Tribunal
                                                         </NavLink>
                                                     </li>
                                                 )}
                                                 {[6, 7].includes(tipoUsuario) && (
                                                     <li>
-                                                        <NavLink
-                                                            to="/asignar-mentor"
-                                                            className={({isActive}) =>
-                                                                `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`
-                                                            }
-                                                        >
+                                                        <NavLink to="/asignar-mentor" className={({isActive}) => `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`}>
                                                             Asignar Mentor
                                                         </NavLink>
                                                     </li>
@@ -382,23 +354,44 @@ export default function Navbar() {
                                         )}
                                     </li>
 
-                                    {/* Link directo a Gestionar Proyectos */}
-                                    <li>
-                                        <NavLink
-                                            to="/gestionar-proyectos"
-                                            className={({isActive}) =>
-                                                `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`
-                                            }
+                                    {/* Submenú Gestionar Proyectos (CORREGIDO) */}
+                                    <li className="dropdown-submenu">
+                                        <button
+                                            type="button"
+                                            className="dropdown-item text-white"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSubmenuGestionProyectosAbierto(!submenuGestionProyectosAbierto);
+                                                setSubmenuGestionEquiposAbierto(false); // Cierra el otro
+                                            }}
+                                            style={{width: '100%', textAlign: 'left', background: 'none', border: 'none'}}
                                         >
-                                            Gestionar Proyectos
-                                        </NavLink>
+                                            Gestionar Proyectos ▼
+                                        </button>
+                                        {submenuGestionProyectosAbierto && (
+                                            <ul className="dropdown-menu show" style={{position: 'relative', background: 'transparent', border: 'none', boxShadow: 'none'}}>
+                                                <li>
+                                                    <NavLink to="/gestionar-proyectos" className={({isActive}) => `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`}>
+                                                        Gestionar Proyectos
+                                                    </NavLink>
+                                                </li>
+                                                {/* Enlace para que el Tribunal evalúe */}
+                                                {[3, 7].includes(tipoUsuario) && (
+                                                    <li>
+                                                        <NavLink to="/evaluar-proyectos" className={({isActive}) => `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`}>
+                                                            Evaluar Proyectos
+                                                        </NavLink>
+                                                    </li>
+                                                )}
+                                            </ul>
+                                        )}
                                     </li>
                                 </ul>
                             </li>
                         )}
+                        {/* ======================== FIN DEL CÓDIGO CORREGIDO ======================== */}
 
-
-                        {/* Menú Usuarios para administradores */}
+                        {/* ... (Tu código para "Usuarios" y "Perfil" no cambia) ... */}
                         {tipoUsuario === 7 && (
                             <li className="nav-item dropdown">
                                 <a
@@ -497,19 +490,15 @@ export default function Navbar() {
                             </li>
                         )}
 
-                        {/* Buscador eventos */}
-                        <li className="nav-item d-none d-lg-block align-self-center">
-                            <BuscadorEventos/>
-                        </li>
-                    </ul>
 
-                    <div className="w-100 mt-2 d-lg-none">
+                    </ul>
+                    <div className="ms-auto">
                         <BuscadorEventos/>
                     </div>
                 </div>
             </nav>
 
-            {/* Modal de cierre de sesión */}
+            {/* ... (Tu código para el Modal no cambia) ... */}
             {showModal && (
                 <div className="custom-modal-overlay">
                     <div className="custom-modal-content">

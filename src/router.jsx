@@ -13,7 +13,7 @@ import EditarPerfil from "./pages/editar-perfil.jsx";
 import DetalleEvento from "./pages/DetalleEvento.jsx";
 import MisEventos from "./pages/MisEventos.jsx";
 import GestionarEventos from './pages/GestionarEventos';
-import VerUsuarios from "./pages/ver-usuarios.jsx"; // ajustá el path si está en otro folder
+import VerUsuarios from "./pages/ver-usuarios.jsx";
 import PerfilUsuario from './pages/PerfilUsuario';
 import DarRol from './pages/DarRol';
 import EliminarUsuario from './pages/eliminar-usuario';
@@ -32,6 +32,8 @@ import GestionarNotificaciones from "./pages/GestionarNotificaciones.jsx";
 import CertificadosEventos from "./pages/CertificadosEventos.jsx";
 import CalendarioEventos from './pages/CalendarioEventos';
 import GestionarEquipos from './pages/GestionarEquipos';
+// --- PASO 1: AÑADE ESTA LÍNEA DE IMPORTACIÓN ---
+import EvaluarProyectos from './pages/EvaluarProyectos.jsx';
 
 
 export const router = createBrowserRouter([
@@ -56,6 +58,18 @@ export const router = createBrowserRouter([
                     </PublicRoute>
                 )
             },
+
+            // --- PASO 2: AÑADE ESTE BLOQUE DE CÓDIGO ---
+            {
+                path: "evaluar-proyectos",
+                element: (
+                    <PrivateRoute>
+                        <EvaluarProyectos/>
+                    </PrivateRoute>
+                )
+            },
+            // --- FIN DEL BLOQUE A AÑADIR ---
+
             {path: "update-password", element: <UpdatePassword/>},
 
             {
