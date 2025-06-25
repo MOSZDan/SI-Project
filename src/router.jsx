@@ -33,6 +33,7 @@ import CertificadosEventos from "./pages/CertificadosEventos.jsx";
 import CalendarioEventos from './pages/CalendarioEventos';
 import GestionarEquipos from './pages/GestionarEquipos';
 import EvaluarProyectos from './pages/EvaluarProyectos';
+import CambiarEventoEstado from './pages/CambiarEventoEstado.jsx'
 
 export const router = createBrowserRouter([
     {
@@ -261,6 +262,14 @@ export const router = createBrowserRouter([
                 element: (
                     <PrivateRoute>
                         <CertificadosEventos/>
+                    </PrivateRoute>
+                )
+            },
+            {
+                path: "cambiar-estado",
+                element: (
+                    <PrivateRoute>
+                        <CambiarEventoEstado/>
                     </PrivateRoute>
                 )
             },

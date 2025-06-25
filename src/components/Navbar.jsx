@@ -300,6 +300,19 @@ export default function Navbar() {
                                                         </li>
                                                     )}
 
+                                                     {tipoUsuario === 7 && (
+                                                        <li>
+                                                            <NavLink
+                                                                to="/gestionar-eventos"
+                                                                className={({isActive}) =>
+                                                                    `dropdown-item text-white ${isActive ? 'fw-bold' : ''}`
+                                                                }
+                                                            >
+                                                                Gestionar Eventos
+                                                            </NavLink>
+                                                        </li>
+                                                    )}
+
                                                 </ul>
                                             )}
                                         </li>
